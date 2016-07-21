@@ -9,6 +9,7 @@
 </head>
 
 <body>
+
 		<nav class="navbar">
 				<div class="navbar-logo">oolaa</div>
 				<ul>
@@ -17,11 +18,8 @@
 						<li>Blog</li>
 						<li>¿Eres estilista?</li>
 				</ul>
-		</nav>
-
-	<div class="search fixedElement">
-			<input type="text" placeholder="busca por tema">
-	</div>
+		</nav>	
+	<?php get_search_form(); ?>
 
 	<section class="blog-left">
 		<div class="blog-left-recent">
@@ -31,33 +29,56 @@
 				$recent_posts = wp_get_recent_posts($args);
 			    foreach( $recent_posts as $recent ){
 			    	echo '<div class="blog-left-recent-box"><a href="' . get_permalink($recent["ID"]) . '">' .        $recent["post_title"].'</a></div>';
-					if ( has_post_thumbnail() ) { // check if the post has a Post Thumbnail assigned to it.
-					    the_post_thumbnail('thumbnail');
-					}
+					
 			    }
 			?>
 		</div>
 		<div class="blog-left-polular">
 			<h3>Mas populares</h3>
-			<div class="blog-left-recent-box">
-				<a href="#">El color de las uñas</a>
-			</div>
-			<div class="blog-left-recent-box">
-				<a href="#">La importancia de un servicio</a>
-			</div>
-			<div class="blog-left-recent-box">
-				<a href="#"><a href="#">Pasos de reclutamiento</a>
-			</div>
-			<div class="blog-left-recent-box">
-				<a href="#">Cálentamiento global</a>
-			</div>
+			
+			<?php
+				$args=array('numberposts' => '4','cat' => '2');
+				$recent_posts = wp_get_recent_posts($args);
+			    foreach( $recent_posts as $recent ){
+			    	echo '<div class="blog-left-recent-box"><a href="' . get_permalink($recent["ID"]) . '">' .        $recent["post_title"].'</a></div>';
+			    }
+			?>
+
 		</div>
 	</section>
 
 	<section class="blog-right">
-
+		<?php
+			$args=array('numberposts' => '4','cat' => '2');
+			$recent_posts = get_posts($args);
+		    foreach( $recent_posts as $recent ){
+				if (has_post_thumbnail($recent->ID) ) { // check if the post has a Post Thumbnail assigned to it.
+				    $image = wp_get_attachment_image_src( get_post_thumbnail_id( $recent->ID ), 'single-post-thumbnail' );
+				    $title= $recent->post_title;
+				    $href= get_permalink($recent->ID);
+				    
+				    global $post;
+				    $post = get_post( $recent->ID);
+				    setup_postdata( $post );
+				    $the_excerpt = get_the_excerpt();
+				    
+					
+				    echo  '<div class="blog-right-article"><img src="'.$image[0].'" alt="uno">
+							<div class="blog-right-article-box">
+								<h3><a href="'.$href.'">'.$title.'</a></h3>
+							</div>
+							<div class="blog-right-article-box">
+								<a href="'.$href.'">'.$the_excerpt.'</a>
+							</div>
+						  </div>';
+					wp_reset_postdata();
+				}
+		    }
+		?>
 	</section>
+	
 	<section class="blog-center">
+
 		<?php
 			if(have_posts()) :
 				while(have_posts()):		
@@ -74,6 +95,7 @@
 
 						<div class="article-text">
 							<?php the_excerpt();?>
+							<a href="<?php the_permalink(); ?>">leer mas</a>
 						</div>
 
 						<div class="article-border"></div>
